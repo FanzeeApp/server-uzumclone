@@ -7,5 +7,3 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /
-    healthCheckInterval: 5000
-    healthCheckTimeout: 2000
