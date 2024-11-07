@@ -1,0 +1,11 @@
+version: 1
+services:
+  - type: web
+    name: your-service-name
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    healthCheckInterval: 5000
+    healthCheckTimeout: 2000
