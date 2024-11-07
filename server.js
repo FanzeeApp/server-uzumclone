@@ -1,26 +1,49 @@
-const express = require('express');  
-const bodyParser = require('body-parser');  
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
-const app = express();  
-const PORT = process.env.PORT || 3000;  
+// Mahsulot modelini yaratish
+const Product = require("./models/Product"); // Mahsulot modelini yaratganingizni taxmin qilaman
 
-app.use(bodyParser.json());  
+const app = express();
 
-let products = [];  
+// JSON formatda so'rovni qabul qilish uchun body-parser
+app.use(bodyParser.json());
 
-app.post('/api/products', (req, res) => {  
-    const newProduct = {  
-        id: products.length + 1,  
-        ...req.body,  
-    };  
-    products.push(newProduct);  
-    res.status(201).json(newProduct);  
-});  
+// MongoDB bilan ulanish
+mongoose
+  .connect("mongodb://localhost:27017/yourDB", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDBga ulanish muvaffaqiyatli"))
+  .catch((err) => console.log(err));
 
-app.get('/api/products', (req, res) => {  
-    res.json(products);  
-});  
+// Mahsulot qo'shish uchun API endpoint
+app.post("/api/products", async (req, res) => {
+  try {
+    const { image, title, description, price, rate } = req.body;
 
-app.listen(PORT, () => {  
-    console.log(`Server ${PORT} portida ishga tushdi`);  
+    // Yangi mahsulot yaratish
+    const newProduct = new Product({
+      image,
+      title,
+      description,
+      price,
+      rate,
+    });
+
+    // Mahsulotni saqlash
+    await newProduct.save();
+
+    res.status(201).json(newProduct); // Mahsulotni qaytarish
+  } catch (error) {
+    res.status(400).json({ message: "Xato yuz berdi", error });
+  }
+});
+
+// Serverni ishga tushurish
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server ${PORT}-portda ishlamoqda`);
 });
